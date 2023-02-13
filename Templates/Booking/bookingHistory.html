@@ -4,28 +4,33 @@
 <section>
     <nav class="navbar bg-light">
         <div class="container-fluid | py-2">
-        <div class='row'>
-            {%if "User" in session%}
-                <form action="{{url_for('account', user=session.User)}}" method='POST'  class='text-decoration-none | font-monospace | col-auto | mx-3 | border-0'>
-                    <input type='submit' value='Overview' class='border-0 | bg-light'> <br>
-                </form>
-            {%endif%}
-            <a href="{{url_for('bookingHistory')}}" class='text-decoration-none | font-monospace | col-auto | mx-3'>Booking History</a>
-            <a href="{{url_for('eventRegistered')}}" class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Event History</a>
-            <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Payment Methods</a>
-            <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Settings</a>
-            <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | ms-5'>Membership : <span class='text-info'>Administrator</span></a>
-        </div>
-          <form class="d-flex | end-0 position-absolute | pe-2" role="search">
-            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success" type="submit">Search</button>
-          </form>
+            <div class='row'>
+                {%if "User" in session%}
+                    <form action="{{url_for('account', user=session.User)}}" method='POST'  class='text-decoration-none | font-monospace | col-auto | mx-3 | border-0'>
+                        <input type='submit' value='Overview' class='border-0 | bg-light'> <br>
+                    </form>
+                {%endif%}
+                <a href="{{url_for('bookingHistory')}}" class='text-decoration-none | font-monospace | col-auto | mx-3'>Booking History</a>
+                <a href="{{url_for('eventRegistered')}}" class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Event History</a>
+                <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Payment Methods</a>
+                <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Settings</a>
+            </div>
+
+            <form class="dropdown" role="sort" method='POST'>
+                {{formsBookingSort.hidden_tag()}}
+                <div class='input-group'>
+                    {{formsBookingSort.selectData(class='input-group-text | bg-white | border border-primary')}}
+    
+                    {{formsBookingSort.submit(class='btn btn-outline-success | bg-white')}}
+                </div>
+            </form>
         </div>
     </nav>
 
     <div class='mx-auto my-2 py-2 | bg-light' style='width:80%'>
         <div class='p-3'>
             <h3 class='text-light text-center bg-dark bg-gradient py-3 rounded'>Registered Bookings</h3>
+
             <table class='table table-striped'>
                 <thread class='row'>
                     <tr>
@@ -50,7 +55,7 @@
                             <p class='fs-4 | font-monospace | mb-0'>{{booking.get_booking_id()}}</p>
                         </td>
                         <td style="width:20%">
-                            <p class='fs-4 | font-monospace | mb-0'>{{booking,get_facility()}}</p>
+                            <p class='fs-4 | font-monospace | mb-0'>{{booking.get_facility()}}</p>
                         </td>
                         <td style="width:20%">
                             <p class='fs-4 | font-monospace | mb-0'>{{booking.get_date()}}</p>

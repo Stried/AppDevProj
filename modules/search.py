@@ -153,4 +153,3 @@ def facilitySearchFunction(searchItem):
         elif isinstance(facilSearchData, str):
             if facilSearchData == facilities.get_fac_loc() or facilSearchData in str(facilities.get_fac_loc()).lower():
                 facilitySearchLocationList.append(facilities)
-            

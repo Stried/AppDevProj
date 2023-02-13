@@ -12,6 +12,14 @@
                 <a href="{{url_for('eventsPageSports')}}" class="text-decoration-none | text-dark"><li class="dropdown-item">Sports</li></a>
                 <a href="{{url_for('eventsPageLifestyle')}}" class="text-decoration-none | text-dark"><li class="dropdown-item">Lifestyle</li></a>
                 <a href="{{url_for('eventsPageOthers')}}" class="text-decoration-none | text-dark"><li class="dropdown-item">Others</li></a>
+                <a href="" class="text-decoration-none | text-dark">
+                    <li class="dropdown-item">
+                        <form class="" role="sort" method='POST'>
+                            {{formSortEvents.hidden_tag()}}
+                            {{formSortEvents.submit(class='border-0 bg-transparent px-0')}}
+                        </form>  
+                    </li>
+                </a>
             </ul>
         </div>
         <p class="font-monospace | my-auto | text-center" style='width:100vw'>Currently Viewing : <span class="text-primary">Lifestyle</span></p>

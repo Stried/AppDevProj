@@ -1,0 +1,93 @@
+{%%}
+<header class="bg-dark | bg-gradient | pt-2">
+    <h1 class="d-flex | flex-row | mb-0">
+        <div id="titleHeader" class="p-4 | ms-3 | text-primary ">
+            <a href="/home" class="fst-italic">ActivePlay</a>
+
+            <div class="fs-6 fst-italic">
+                <a href='#' class='text-decoration-none' data-bs-toggle='modal' data-bs-target='#someModal'>Play hard.</a>
+                <div class='modal fade' id='someModal' tabindex='-1' aria-labelledby='someModalLabel' aria-hidden='true'>
+                    <div class='modal-dialog'>
+                        <div class='modal-content'>
+                            <div class='card' style='max-width: 540px'>
+                                <div class='row g-0'>
+                                    <div class='col-md-4'>
+                                        <img src="{{url_for('static', filename='warugiSmile.png')}}" class="img-fluid rounded-start" alt="...">
+                                    </div>
+                                    <div class='col-md-8'>
+                                        <div class='card-body'>
+                                            <h5 class='card-title'>Hello!</h5>
+                                            <h5 class='card-text text-dark'>
+                                                No clue how you ended up here.
+                                            </h5>
+                                            <h5 class='text-dark'>
+                                                Welcome to <span class='text-primary'>ActivePlay</span>!!
+                                            </h5>
+                                            <h5 class='text-muted'>
+                                                <small>Psst.. <a href='#' class='text-muted' id='clickMe' onclick='noClick()'>Click Here</a>!</small>
+                                            </h5>
+                                            <small class='text-muted' id='clickWarningText'></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class='modal-footer'>
+                                <small class='text-secondary | mx-auto'>“Exercise is wonderful," said Louis. "I could sit and watch it all day.” <br> <span class='ms-3'>- Larry Niven, Ringworld</span></small>
+                                <p>ActivePlay.SG</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="dropdown | my-auto | px-5 | mx-2 | pb-2 | border-end | border-2 | border-primary | border-gradient">
+            <button class="btn btn-primary | dropdown-toggle | bg-transparent | px-4" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Facilities
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{url_for('facilitiesPage')}}">View Facilities</a></li>
+                <li><a name="adminOnly" class="dropdown-item text-danger" href="#">Create Facilities</a></li>
+                <li><a class='dropdown-item text-danger' href='#'>Edit Facilities</a></li>
+            </ul>
+        </div>
+        <div class="dropdown | my-auto px-5 mx-2 pb-2 | border-end border-2 border-primary | border-gradient">
+            <button class="btn btn-primary | dropdown-toggle | bg-transparent | px-4" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Events
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{url_for('eventsPage')}}">View Events</a></li>
+                <li><a class="dropdown-item" href="#">Registered Events</a></li>
+                <li><a name="adminOnly" class="dropdown-item text-danger" href="{{url_for('createEvent')}}">Create Events</a></li>
+                <li><a name='adminOnly' class='dropdown-item text-danger' href="{{url_for('editEvent')}}">Edit Events</a><li>
+            </ul>
+        </div>
+        <div class="dropdown | my-auto px-5 mx-2 pb-2">
+            <button class="btn btn-primary | dropdown-toggle | bg-transparent | px-4" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Booking
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{{url_for('bookingPage')}}">Book Facilities</a></li>
+                <li><a class="dropdown-item" href="{{url_for('bookingCurrent')}}">View Current Bookings</a></li>
+                <li><a class="dropdown-item" href="{{url_for('bookingHistory')}}">View Booking History</a></li>
+            </ul>
+        </div>
+        <div class="my-auto | p-3 pt-4 mt-1 | end-0 position-absolute ">
+            <button class="text-primary | bg-transparent | border-0 | fs-5 | pe-3 | border-end | border-2 | border-secondary | border-gradient | ">
+                <a href='/register' class='text-decoration-none'>Register</a>
+            </button>
+            <button class="text-primary | bg-transparent | border-0 | fs-5 | pe-5 | ">
+                <a href='/login' class='text-decoration-none'>Login</a>
+            </button>
+        </div>
+    </h1>
+</header>
+<script>
+    function noClick() {
+        var warningText = document.getElementById('clickWarningText')
+        warningText.innerText = '(๑˃̵　ᴗ　˂̵)و   Enjoy Your Time Here!'
+    }
+</script>

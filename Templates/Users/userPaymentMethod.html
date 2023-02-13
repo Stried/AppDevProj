@@ -1,0 +1,31 @@
+{%extends 'layout.html'%}
+{%block content%}
+
+<section>
+    <nav class="navbar bg-light">
+        <div class="container-fluid | py-2">
+        <div class='row'>
+            {%if "User" in session%}
+                <form action="{{url_for('account', user=session.User)}}" method='POST'  class='text-decoration-none | font-monospace | col-auto | mx-3 | border-0'>
+                    <input type='submit' value='Overview' class='border-0 | bg-light | text-primary'> <br>
+                </form>
+            {%endif%}
+            <a href="{{url_for('bookingHistory')}}" class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Booking History</a>
+            <a href="{{url_for('eventRegistered')}}" class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Event History</a>
+            <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Payment Methods</a>
+            <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | mx-3'>Settings</a>
+            <a href='#' class='text-decoration-none | font-monospace text-dark | col-auto | ms-5'>Membership : <span class='text-info'>Administrator</span></a>
+        </div>
+          <form class="d-flex | end-0 position-absolute | pe-2" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+    </nav>
+    <div class='mx-auto my-2 py-2 | bg-light' style='width:80%'>
+        
+    </div>
+</section>
+
+
+{%endblock%}

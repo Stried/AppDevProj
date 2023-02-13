@@ -10,19 +10,46 @@
             {{formEvents.hidden_tag()}}
 
             {{formEvents.editEventName.label(class='text-dark | fs-4 | float-start | ms-2')}}
+            {%if formEvents.editEventName.errors%}
                 <div>
-                    {{formEvents.editEventName(class='form-control | my-2')}}
+                    {{formEvents.editEventName(class='form-control | border-danger | my-2')}}
                 </div>
+                {%for errors in formEvents.editEventName.errors%}
+                    <span class='text-danger | float-end'>{{errors}}</span>
+                {%endfor%}
+            {%else%}
+            <div>
+                {{formEvents.editEventName(class='form-control | my-2')}}
+            </div>
+            {%endif%}
 
             {{formEvents.editEventDesc.label(class='text-dark | fs-4 | float-start | ms-2')}}
-            <div>
-                {{formEvents.editEventDesc(class='form-control | my-2')}}
-            </div>
+            {%if formEvents.editEventDesc.errors%}
+                <div>
+                    {{formEvents.editEventDesc(class='form-control | border-danger | my-2')}}
+                </div>
+                {%for errors in formEvents.editEventDesc.errors%}
+                    <span class='text-danger | float-end'>{{errors}}</span>
+                {%endfor%}
+            {%else%}
+                <div>
+                    {{formEvents.editEventDesc(class='form-control | my-2')}}
+                </div>
+            {%endif%}
 
             {{formEvents.editEventVacancy.label(class='text-dark | fs-4 | float-start | ms-2')}}
+            {%if formEvents.editEventVacancy.errors%}
+            <div>
+                {{formEvents.editEventVacancy(class='form-control | border-danger | my-2')}}
+            </div>
+            {%for errors in formEvents.editEventVacancy.errors%}
+                <span class='text-danger | float-end |'>{{errors}}</span>
+            {%endfor%}
+            {%else%}
             <div>
                 {{formEvents.editEventVacancy(class='form-control | my-2')}}
             </div>
+            {%endif%}
 
             <div class=''>
                 <div class='d-flex mt-3'>
@@ -99,14 +126,32 @@
             </div>
 
             {{formEvents.editEventLocation.label(class='text-dark | fs-4 | float-start | ms-2')}}
-            <div>
-                {{formEvents.editEventLocation(class='form-control | my-2')}}
-            </div>
+            {%if formEvents.editEventLocation.errors%}
+                <div>
+                    {{formEvents.editEventLocation(class='form-control | my-2 | border-danger')}}
+                </div>
+                {%for errors in formEvents.editEventLocation.errors%}
+                <span class='text-danger | float-end'>{{errors}}</span>
+                {%endfor%}
+            {%else%}
+                <div>
+                    {{formEvents.editEventLocation(class='form-control | my-2')}}
+                </div>
+            {%endif%}
 
             {{formEvents.editEventVenue.label(class='text-dark | fs-4 | float-start | ms-2')}}
-            <div>
-                {{formEvents.editEventVenue(class='form-control | my-2')}}
-            </div>
+            {%if formEvents.editEventVenue.errors%}
+                <div>
+                    {{formEvents.editEventVenue(class='form-control | my-2 | border-danger')}}
+                </div>
+                {%for errors in formEvents.editEventVenue.errors%}
+                <span class='text-danger | float-end'>{{errors}}</span>
+                {%endfor%}
+            {%else%}
+                <div>
+                    {{formEvents.editEventVenue(class='form-control | my-2')}}
+                </div>
+            {%endif%}
 
             {{formEvents.editEventStatus.label(class='text-dark | fs-4 | float-start | ms-2')}}
             <div>

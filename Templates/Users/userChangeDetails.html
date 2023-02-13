@@ -1,0 +1,121 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<h1 class='text-center | py-3'>
+    Edit User
+</h1>
+<div class='container | py-3 | bg-light border-dark border-2 border rounded-3 | my-3 '>
+    <section>
+        <form action="" method="post" class='container-sm'>
+            {{editForm.hidden_tag()}}
+
+            <!-- ---------------------------------------------------------------------------------------- -->
+            <!-- USERNAME VALIDATION START -->
+
+            {{editForm.editUsername.label(class='text-dark | fs-4 | float-start | ms-2')}}
+            {%if editForm.editUsername.errors%}
+                <div>
+                    {{editForm.editUsername(class='form-control | my-2 | border-danger')}}
+                </div>
+            {%for errors in editForm.editUsername.errors%}
+                <span class='text-danger | float-end'>
+                    {{errors}}
+                </span> 
+            {%endfor%}
+            {%else%}   
+                <div>
+                    {{editForm.editUsername(class='form-control | my-2')}}
+                </div>
+            {%endif%}
+
+            <!-- USERNAME VALIDATION END -->
+            <!-- ---------------------------------------------------------------------------------------- -->
+            <!-- FIRSTNAME VALIDATION START-->
+
+            {{editForm.editFirstName.label(class='text-dark | fs-4 | float-start | ms-2')}}
+            {%if editForm.editFirstName.errors%}
+                <div>
+                    {{editForm.editFirstName(class='form-control | my-2 | border-danger')}}
+                </div>
+            {%for errors in editForm.editFirstName.errors%}
+                <span class='text-danger | float-end'>
+                    {{errors}}
+                </span>
+            {%endfor%}
+            {%else%}
+                <div>
+                    {{editForm.editFirstName(class='form-control | my-2')}}
+                </div>
+            {%endif%}
+
+            <!-- FIRSTNAME VALIDATION END -->
+            <!-- ---------------------------------------------------------------------------------------- -->
+            <!-- LASTNAME VALIDATION START -->
+
+            {{editForm.editLastName.label(class='text-dark | fs-4 | float-start | ms-2')}}
+            {%if editForm.editLastName.errors%}
+            <div>
+                {{editForm.editLastName(class='form-control | my-2 | border-danger')}}
+            </div>
+            {%for errors in editForm.editLastName.errors%}
+                <span class='text-danger | float-end'>
+                    {{errors}}
+                </span>
+            {%endfor%}
+            {%else%}
+                <div>
+                    {{editForm.editLastName(class='form-control | my-2')}}
+                </div>
+            {%endif%}
+
+            <!-- LASTNAME VALIDATION END -->
+            <!-- ---------------------------------------------------------------------------------------- -->
+            <!-- EMAIL VALIDATION START -->
+
+            {{editForm.editEmail.label(class='text-dark | fs-4 | float-start | ms-2')}}
+            {%if editForm.editEmail.errors%}
+            <div>
+                {{editForm.editEmail(class='form-control | my-2 | border-danger')}}
+            </div>
+            {%for errors in editForm.editEmail.errors%}
+                <span class='text-danger | float-end'>
+                    {{errors}}
+                </span>
+            {%endfor%}
+            {%else%}
+                <div>
+                    {{editForm.editEmail(class='form-control | my-2')}}
+                </div>
+            {%endif%}
+
+            <!-- EMAIL VALIDATION END -->
+            <!-- ---------------------------------------------------------------------------------------- -->
+            <!-- PHONENO VALIDATION START -->
+            
+            {{editForm.editPhoneNo.label(class='text-dark | fs-4 | float-start | ms-2')}}
+            {%if editForm.editPhoneNo.errors%}
+            <div>
+                {{editForm.editPhoneNo(class='form-control | my-2 | border-danger')}}
+            </div>
+            {%for errors in editForm.editPhoneNo.errors%}
+                <span class='text-danger | float-end'>
+                    {{errors}}
+                </span>
+            {%endfor%}
+            {%else%}
+                <div>
+                    {{editForm.editPhoneNo(class='form-control | my-2')}}
+                </div>
+            {%endif%}
+
+            <!-- PHONENO VALIDATION END -->
+            <!-- ---------------------------------------------------------------------------------------- -->
+
+            <div class="text-center | my-4 mx-auto | " style='width:50%'>
+                {{editForm.submit(class='btn btn-primary')}}
+            </div>
+        </form>
+    </section>
+</div>
+
+{% endblock %}

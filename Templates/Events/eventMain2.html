@@ -1,0 +1,105 @@
+{%extends 'layout.html'%}
+{%block content%}
+
+<nav class="navbar bg-light">
+    <div class="container-fluid | py-2">
+        <div class='dropdown | start-0 position-absolute | ps-2'>
+            <button class="btn btn-secondary | dropdown-toggle" type="button" id="dropdownLocation" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Type
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownLocation" >
+                <a href="{{url_for('eventsPage')}}" class="text-decoration-none | text-dark"><li class="dropdown-item">All</li></a>
+                <a href="{{url_for('eventsPageSports')}}" class="text-decoration-none | text-dark"><li class="dropdown-item">Sports</li></a>
+                <a href="{{url_for('eventsPageLifestyle')}}" class="text-decoration-none | text-dark"><li class="dropdown-item">Lifestyle</li></a>
+                <a href="{{url_for('eventsPageOthers')}}" class="text-decoration-none | text-dark"><li class="dropdown-item">Others</li></a>
+            </ul>
+        </div>
+        <p class="font-monospace | my-auto | text-center" style='width:100vw'>Currently Viewing : <span class="text-primary">All</span></p>
+      <form class="d-flex | end-0 position-absolute | pe-2" role="search">
+        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </nav>
+
+<section class='mb-3'>
+    <div class='mx-auto row' style='width:80%'>
+    {%for event in eventsList%}
+        <div class='mx-auto my-4 col-4'>
+            <div class="card" style="" id='cardExpand'>
+                <div class="card-body">
+                <h5 class="card-title | text-primary">{{event.get_eventName()}}</h5>
+                <p class="card-text">{{event.get_eventDesc()}}</p>
+                <div class='p-2 | bg-light border-secondary border-2 border rounded'>
+                    <p class='mb-0'>Event Date : <span class='text-primary'>{{event.get_eventDate()}}</span></p>
+                    <p class='mb-0'>Event Vacancy : <span>{{event.get_eventVacancy()}}</span></p>
+                    <p class='mb-0'>Event ID : <span>{{event.get_eventID()}}</span></p>
+                    <p class='mb-0'>Event Type : <span>{{event.get_eventType()}}</span></p>
+                </div>
+                <hr>
+                
+                    <form action="" method='POST'class='col-auto'>
+                        <input type='submit' value='Sign Up' class='btn btn-primary'>
+                    </form>
+                    
+                    <a href="#" class='text-decoration-none btn btn-danger' data-bs-toggle='modal' data-bs-target='#deleteModal' style="width:25%">Delete</a>
+                    
+                    <div class='modal fade' id='deleteModal' tabindex='-1' aria-labelledby='deleteModalLabel' aria-hidden='true'>
+                        <div class='modal-dialog'>
+                            <div class='modal-content'>
+                                <div class="modal-body">
+
+                                    <div class='card-body'>
+                                        
+                                        <p>some placeholder</p>
+                                        
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form action="{{url_for('editEventDirect', id=event.get_eventID())}}" method='POST'class='col-auto'>
+                        <input type='submit' value='Edit' class='btn btn-success'>
+                    </form>
+
+                <form action="{{url_for('deleteEventDirect', id=event.get_eventID())}}" method='POST'class='col-auto'>
+                                        <input type='submit' value='Delete' class='btn btn-danger'>
+                                    </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</section>
+<style>
+    div#cardExpand {
+        transition: all 0.3s;
+    }
+    
+    div#cardExpand:hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    body {
+        background: url('https://images.unsplash.com/photo-1626721105368-a69248e93b32?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80') no-repeat center center fixed;
+        -webkit-background-size: cover;
+        -moz-background-size: cover;
+        background-size: cover;
+        -o-background-size: cover;
+      }
+
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    body::-webkit-scrollbar {
+    display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    body {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+    }
+</style>
+
+{%endblock%}

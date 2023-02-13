@@ -5,11 +5,16 @@ from OOP.eventFunction import *
 from OOP.Bookings import *
 from OOP.Facilities import *
 
-facilIDList = []
 facilityIDList = []
 facilityUIDList = []
 
 def refreshFacilityList():
+    global facilityIDList
+    global facilityUIDList
+    
+    facilityIDList.clear()
+    facilityUIDList.clear()
+    
     facilDict = {}
     facilDB = shelve.open('Facilities')
     try:    

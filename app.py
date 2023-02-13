@@ -1,26 +1,25 @@
-from flask import Flask, render_template, url_for, flash, redirect, request, session
-from flask_mail import Mail, Message
-import shelve
-from datetime import datetime, date
-import secrets
 import random
+import secrets
+import shelve
+from datetime import date, datetime
 
+from flask import (Flask, flash, redirect, render_template, request, session,
+                   url_for)
+from flask_mail import Mail, Message
 from wtforms.validators import ValidationError
-from forms import RegistrationForm, LoginForm, EditForm, userSearchForm
+
+from bookingForms import bookingForm, bookingSortForm, paymentForm
 from eventForms import *
-from bookingForms import bookingForm, paymentForm
-from FacilitiesForm import CreateFacilityForm, EditFacilityForm, SearchFacilityForm, SortFacilityForm
-
-from OOP.userFunction import *
-from OOP.eventFunction import *
-from OOP.Bookings import *
-from OOP.Facilities import *
-
+from FacilitiesForm import (CreateFacilityForm, EditFacilityForm,
+                            SearchFacilityForm, SortFacilityForm)
+from forms import *
+from modules.refreshList import *
 from modules.search import *
 from modules.sort import *
-from modules.refreshList import *
-
-import smtplib
+from OOP.Bookings import *
+from OOP.eventFunction import *
+from OOP.Facilities import *
+from OOP.userFunction import *
 
 # Sets the facilityIDList n facilityUIDList from refreshList.py as a local variable
 facilityIDList_App = facilityIDList
@@ -31,6 +30,13 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '8ecce6a32ba6703d10b72f3ccea07175'
 app.config["SESSION_PERMANENT"] = False
 
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'activeplaytest@gmail.com'
+app.config['MAIL_PASSWORD'] = 'hfpqlfpnmrrhezau'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 # Main pages
 @app.route('/')
@@ -74,9 +80,17 @@ def home():
 def contact():
     return render_template('forms.html')
 
-@app.route('/overview')
+@app.route('/mailTest', methods=['GET', 'POST'])
 def overview():
-    return render_template('overview.html', title = 'Overview')
+    if request.method == 'POST':
+         msg = Message('Please Verify Your Email',
+                        sender='donotreply@activeplay.sg',
+                        recipients=['activeplaytest@gmail.com'])
+         msg.body = 'Hello! This is Yue from Activeplay.SG'
+         msg.html = '<span>Please verify your account by clicking on this <a href="localhost:5000">link</a></span>'
+         
+         mail.send(msg)
+    return render_template('mailTest.html', title = 'Mail')
 
 # User Functions
 @app.route('/register', methods=['GET', 'POST'])
@@ -118,6 +132,15 @@ def register():
             db['Users'] = dictUsers
             
             session['User'] = [userName, userID, userEmail, userFirstName, userLastName, userPhoneNo, userDateJoined]
+            
+            msg = Message('Please Verify Your Email',
+                            sender='donotreply@activeplay.sg',
+                            recipients=['activeplaytest@gmail.com'])
+            msg.html = f'Hello {userFirstName} {userLastName}! This is Yue from Activeplay.SG. Please verify your account ({userEmail}) by clicking the link <a href="https://127.0.0.1:5000/home">here</a>'
+            
+            mail.send(msg)
+            
+            flash(f'A verification email has been sent to {userEmail}.', 'login')
             return redirect(url_for('home'))
     return render_template('registration.html', title = 'Register', form=form)
 
@@ -203,6 +226,7 @@ def login():
                 userPhoneNo = userPhoneNoList[index] # Item 5
                 userDateJoined = userDateJoinedList[index] # Item 6
                 session['User'] = [userName, userID, userEmail, userFirst, userLast, userPhoneNo, userDateJoined]
+                
                 return redirect(url_for('home'))
             else:
                 flash('Login Unsuccessful. Please check Email/Phone Number and Password.', 'danger')
@@ -224,9 +248,10 @@ def login():
                 userPhoneNo = userPhoneNoList[index] # Item 5
                 userDateJoined = userDateJoinedList[index] # Item 6
                 session['User'] = [userName, userID, userEmail, userFirst, userLast, userPhoneNo, userDateJoined]
+
                 return redirect(url_for('home'))
             else:
-                flash('Login Unsuccessful. Please check Email/Phone Number and Password.', 'danger')
+                flash(f'Login Unsuccessful. Please check Email/Phone Number and Password.', 'danger')
                 return redirect(url_for('login'))
                 
         else:
@@ -234,6 +259,46 @@ def login():
             return redirect(url_for('login'))
         
     return render_template('login.html', title = 'Login', form=form)
+
+@app.route('/forgotPassword', methods=['GET', 'POST'])
+def forgetPassword():
+    forgotPasswordFormCheck = userForgotPasswordCheck()
+    forgotPasswordForm = userForgotPassword()
+    resetPasswordForm = userResetPassword()
+    userList = []         
+    
+        
+    if forgotPasswordFormCheck.validate_on_submit() and forgotPasswordFormCheck.data:
+        dictsUser ={}
+        db = shelve.open('users')
+        try:
+            if 'Users' in db:
+                dictsUser = db['Users']
+            else:
+                db['Users'] = dictsUser
+        except:
+            print('An Unknown Error Occured')
+        print(dictsUser)
+        
+        for users in dictsUser:
+            user = dictsUser.get(users)
+            if user.get_email() == forgotPasswordFormCheck.userEmail.data:
+                userPassword = user.get_password()
+                userList.append(userPassword)
+        
+        forgetPasswordMsg = Message('Password Replacement',
+                                    sender='donotreply@activeplay.sg',
+                                    recipients=['activeplaytest@gmail.com'])
+        forgetPasswordMsg.html = f'Hello! This is Yue from Activeplay.SG. <br> Your Password is {userList}. If you did not request a change, please contact support immediately.'
+        
+        mail.send(forgetPasswordMsg)
+        
+        flash('Please check your email.', 'resetPassword')
+        
+    return render_template('forgotPassword.html', title = 'Forgot Password',
+                           forgotPasswordFormCheck = forgotPasswordFormCheck,
+                           forgotPasswordForm = forgotPasswordForm,
+                           userList = userList)
 
 @app.route('/users', methods=['GET', 'POST'])
 def users():
@@ -359,6 +424,112 @@ def deleteUser(id):
     else:
         return render_template('404.html')
 
+@app.route('/account/changeDetails/<id>', methods=["GET", "POST"])
+def changeUserDetails(id):
+    editForm = EditForm()
+    if editForm.validate_on_submit() and request.method == 'POST':
+        dictsUser ={}
+        db = shelve.open('users')
+        try:
+            if 'Users' in db:
+                dictsUser = db['Users']
+            else:
+                db['Users'] = dictsUser
+        except:
+            print('An Unknown Error Occured')
+        print(dictsUser)
+        
+        userID = id
+        
+        currentUser = dictsUser.get(userID)
+        currentUserPass = currentUser.get_password()
+        
+        currentDateJoined = currentUser.get_dateJoined()
+        
+        userName = editForm.editUsername.data
+        userFirst = editForm.editFirstName.data
+        userLast = editForm.editLastName.data
+        userEmail = editForm.editEmail.data
+        userPass = currentUserPass
+        userPhoneNo = editForm.editPhoneNo.data
+        userDateJoined = currentDateJoined
+        print(userID)
+        
+        
+        user = User(userName, userFirst, userLast, userEmail, userID, userPhoneNo, userDateJoined, userPass)
+        dictsUser[user.get_uid()] = user
+        db['Users'] = dictsUser
+        
+        session.pop('User', None)
+        session['User'] = [userName, userID, userEmail, userFirst, userLast, userPhoneNo, userDateJoined]
+
+        return redirect(url_for('account'))
+    
+    else:
+        dictsUser ={}
+        db = shelve.open('users')
+        try:
+            if 'Users' in db:
+                dictsUser = db['Users']
+            else:
+                db['Users'] = dictsUser
+        except:
+            print('An Unknown Error Occured')
+        print(dictsUser)
+        print(id)
+        
+        users = dictsUser.get(id)
+        editForm.editUsername.data = users.get_username()
+        editForm.editFirstName.data = users.get_firstName()
+        editForm.editLastName.data = users.get_lastName()
+        editForm.editEmail.data = users.get_email()
+        editForm.editPhoneNo.data = users.get_phoneNo()
+        
+    return render_template('Users/userChangeDetails.html', editForm = editForm)
+
+@app.route('/account/changePassword/<id>', methods=["GET", "POST"])
+def changeUserPassword(id):
+    editForm = userEditPassword()
+    
+    if editForm.validate_on_submit() and request.method == 'POST':
+        dictsUser ={}
+        db = shelve.open('users')
+        try:
+            if 'Users' in db:
+                dictsUser = db['Users']
+            else:
+                db['Users'] = dictsUser
+        except:
+            print('An Unknown Error Occured')
+        print(dictsUser)
+        
+        userID = id
+        
+        currentUser = dictsUser.get(userID)
+        currentUserPass = currentUser.get_password()
+        currentDateJoined = currentUser.get_dateJoined()
+        
+        userName = currentUser.get_username()
+        userFirst = currentUser.get_firstName()
+        userLast = currentUser.get_lastName()
+        userEmail = currentUser.get_email()
+        userPass = currentUserPass
+        userPhoneNo = currentUser.get_phoneNo()
+        userDateJoined = currentDateJoined
+        userPassword = editForm.editPassword.data
+        print(userID)
+        
+        if userPassword == userPass:
+            flash('New password cannot be the same as old password')
+            return render_template('Users/userChangePassword.html', editForm=editForm)
+        
+        user = User(userName, userFirst, userLast, userEmail, userID, userPhoneNo, userDateJoined, userPassword)
+        dictsUser[user.get_uid()] = user
+        db['Users'] = dictsUser
+        
+        return redirect(url_for('home'))
+    return render_template('Users/userChangePassword.html', editForm = editForm)
+
 # DO NOT TOUCH, NO CLUE WHY IT WORKS, IT JUST DOES - WE DON'T KNOW HOW EITHER - CONSULT BUDDHA @ 404
 @app.route('/account', methods=['GET', 'POST'])
 def account():
@@ -462,42 +633,6 @@ def createEvent():
 
 # EDIT EVENTS ROUTING
     # DO NOT TOUCH!!!!!!!!
-    formEvents = eventEditForm()
-    if formEvents.validate_on_submit() and request.method == 'POST':
-        eventsDict = {}
-        eventDB = shelve.open('Events')
-        try:
-            if 'Events' in eventDB:
-                eventsDict = eventDB['Events']
-            else:
-                eventDB['Events'] = eventsDict
-        except:
-            print('Error in retrieving events.')
-            
-        eventName = formEvents.editEventName.data
-        eventDesc = formEvents.editEventDesc.data
-        eventVacancy = formEvents.editEventVacancy.data
-        eventDate = formEvents.editEventDate.data
-        eventID = formEvents.editEventID.data
-        eventType = formEvents.editEventType.data
-        
-        if eventID not in eventsDict.keys():
-            print('Error.')
-            flash('Event ID not found in Event Database.', 'error')
-        else:
-            ce = createEvents(eventName, eventDesc, eventVacancy, eventDate, eventID, eventType)
-            eventsDict[ce.get_eventID()] = ce
-            eventDB['Events'] = eventsDict
-            
-            eventDB.close()
-            print(eventsDict.keys())
-                    
-            return redirect(url_for('eventsPage'))
-        
-    if session['User'][0] == 'Administrator' and session['User'][1] == '0000000':
-        return render_template('Events/eventEdit.html', formEvents = formEvents)
-    else:
-        return render_template('404.html')
 
 @app.route('/events/editEvents/<int:id>', methods=['GET', 'POST'])
 def editEventDirect(id):
@@ -816,42 +951,15 @@ def eventRegistered():
     else:
         return redirect(url_for('login'))
 
-    formEvents = eventSearchForm()
-    
-    eventIDList_searchPage = []
-    eventNameList_searchPage = []
-    eventLocationList_searchPage = []
-    eventVenueList_searchPage = []
-    
-    if formEvents.validate_on_submit() and request.method == 'POST':
-    
-        eventSearchData = formEvents.eventSearchItem.data
-        
-        eventSearchFunction(eventSearchData)
-        
-        eventIDList_searchPage = eventSearchIDList # lists from search.py
-        eventNameList_searchPage = eventSearchNameList
-        eventLocationList_searchPage = eventSearchLocationList
-        eventVenueList_searchPage = eventSearchVenueList
-        
-        print(eventIDList_searchPage, eventNameList_searchPage, eventLocationList_searchPage, eventVenueList_searchPage)
-        
-        return render_template('Events/eventSearch.html', formEvents = formEvents,
-                                eventIDList_searchPage = eventIDList_searchPage,
-                                eventNameList_searchPage = eventNameList_searchPage,
-                                eventLocationList_searchPage = eventLocationList_searchPage,
-                                eventVenueList_searchPage = eventVenueList_searchPage)
-    
-    return render_template('Events/eventSearch.html', formEvents = formEvents,
-                                eventIDList_searchPage = eventIDList_searchPage,
-                                eventNameList_searchPage = eventNameList_searchPage,
-                                eventLocationList_searchPage = eventLocationList_searchPage,
-                                eventVenueList_searchPage = eventVenueList_searchPage)
-
 # Booking functions
 @app.route('/booking', methods=['GET', 'POST'])
 def bookingPage():
     formsBooking = bookingForm()
+    refreshFacilityList()
+    facilityIDList_createBooking = facilityIDList_App
+    facilityUIDList_createBooking = facilityUIDList_App
+    #Then hpw do I do all facilities for sorting, can try
+    formsBooking.bookingFacilityID.choices = [(facilityIDList_createBooking[i], f"{facilityUIDList_createBooking[i]} - {facilityIDList_createBooking[i]}") for i in range(len(facilityUIDList_createBooking))] # refreshes the facility list
     
     facilDict = {}
     facilDB = shelve.open('Facilities')
@@ -901,18 +1009,18 @@ def bookingPage():
                 for facil in facilDict:
                     if facilDict[facil].get_fac_id()==bookFacil:
                         cost = facilDict[facil].get_fac_rate()
-                return redirect(url_for('bookingPayment', bookFacil = bookFacil, bookDate = bookDate, bookTime = bookTime, cost = cost))
+                return redirect(url_for('bookingPayment', userID = userID, bookFacil = bookFacil, bookDate = bookDate, bookTime = bookTime, cost = cost))
 
             else:
-                return render_template('Booking/bookingConflict.html', formsBooking = formsBooking)
+                return render_template('Booking/bookingConflict.html', formsBooking = formsBooking, text = "Facility Booking")
         
         return render_template('Booking/bookingMain.html', formsBooking = formsBooking)
        
     else:
         return redirect(url_for('login'))
 
-@app.route('/booking/bookingPayment/<bookFacil>/<bookDate>/<bookTime>/<cost>', methods=['GET', 'POST'])
-def bookingPayment(bookFacil, bookDate, bookTime, cost):
+@app.route('/booking/bookingPayment/<userID>/<bookFacil>/<bookDate>/<bookTime>/<cost>', methods=['GET', 'POST'])
+def bookingPayment(userID, bookFacil, bookDate, bookTime, cost):
     formsPayment = paymentForm()
     if formsPayment.validate_on_submit() and request.method == 'POST':
         payMethod = formsPayment.paymentMethod.data
@@ -932,7 +1040,7 @@ def bookingPayment(bookFacil, bookDate, bookTime, cost):
         
         bookDate = bookDate.replace("-","/")
         bookDate = datetime.datetime.strptime(bookDate, '%Y/%m/%d').date()
-        fb = FacilityBooking(bookFacil, bookDate, bookTime)
+        fb = FacilityBooking(userID, bookFacil, bookDate, bookTime)
         fb.set_booking_id()
         bookingUID = fb.get_booking_id()
         bookingFacilDict[(bookingUID)] = fb
@@ -959,8 +1067,14 @@ def bookingPayment(bookFacil, bookDate, bookTime, cost):
 
     return render_template('Booking/bookingPayment.html', formsPayment = formsPayment, cost = cost)
 
-@app.route('/booking/bookingCurrent')
+@app.route('/booking/bookingCurrent', methods=['GET', 'POST'])
 def bookingCurrent():
+    refreshFacilityList()
+    facilityIDList_createBooking = facilityIDList_App
+    facilityUIDList_createBooking = facilityUIDList_App
+    formsBookingSort = bookingSortForm()
+    
+    formsBookingSort.selectData.choices = [(facilityIDList_createBooking[i], f"{facilityUIDList_createBooking[i]} - {facilityIDList_createBooking[i]}") for i in range(len(facilityUIDList_createBooking))] # refreshes the facility list
     if 'User' in session:
         userID = session['User'][1]
         bookingsDict = {}
@@ -970,16 +1084,26 @@ def bookingCurrent():
         bookingsList=[]
         for booking in bookingsDict:
             bookings = bookingsDict[booking]
-            if bookings.get_date()>=date.today():
-                bookingsList.append(bookings)
+            if bookings.get_user()==userID and bookings.get_date()>=date.today():
+                if formsBookingSort.validate_on_submit() and request.method == "POST":
+                    sortData = formsBookingSort.selectData.data
+                    if bookings.get_facility()==sortData:
+                        bookingsList.append(bookings)
+                else:
+                    bookingsList.append(bookings)
 
-        return render_template('Booking/bookingCurrent.html', bookingsList = bookingsList)
+        return render_template('Booking/bookingCurrent.html', bookingsList = bookingsList, formsBookingSort = formsBookingSort)
     else:
         return redirect(url_for('login'))
 
 @app.route('/booking/bookingEdit/<id>', methods=['GET', 'POST'])
 def editBookings(id):
+    refreshFacilityList()
+    facilityIDList_createBooking = facilityIDList_App
+    facilityUIDList_createBooking = facilityUIDList_App
     formsBooking = bookingForm()
+    formsBooking.bookingFacilityID.choices = [(facilityIDList_createBooking[i], f"{facilityUIDList_createBooking[i]} - {facilityIDList_createBooking[i]}") for i in range(len(facilityUIDList_createBooking))] # refreshes the facility list
+
     if formsBooking.validate_on_submit() and request.method == 'POST':
         bookingsDict = {}
         bookingDB = shelve.open('Bookings')
@@ -1004,20 +1128,30 @@ def editBookings(id):
         bookFacil = formsBooking.bookingFacilityID.data
         bookDate = formsBooking.bookingDate.data
         bookTime = formsBooking.bookingTimeSlot.data
-
-        fb = bookingsDict[id]
-        fb.set_facility(bookFacil)
-        fb.set_date(bookDate)
-        fb.set_timeslot(bookTime)
-        bookingsDict[fb.get_booking_id()] = fb
-        bookingDB['Bookings'] = bookingsDict
-        bookingFacilDict[fb.get_booking_id()] = fb
-        bookingFacilDB['BookingFacil'] = bookingsDict
-
-        bookingDB.close()
-        bookingFacilDB.close()
+        conflict = False
         
-        return redirect(url_for('bookingCurrent'))
+        for i in bookingFacilDict:
+            other_booking=bookingFacilDict[i]
+            if other_booking.get_facility()==bookFacil and other_booking.get_date()==bookDate and other_booking.get_timeslot()==bookTime:
+                conflict=True
+
+        if conflict==False:
+            fb = bookingsDict[id]
+            fb.set_facility(bookFacil)
+            fb.set_date(bookDate)
+            fb.set_timeslot(bookTime)
+            bookingsDict[fb.get_booking_id()] = fb
+            bookingDB['Bookings'] = bookingsDict
+            bookingFacilDict[fb.get_booking_id()] = fb
+            bookingFacilDB['BookingFacil'] = bookingsDict
+
+            bookingDB.close()
+            bookingFacilDB.close()
+        
+            return redirect(url_for('bookingCurrent'))
+
+        else:
+            return render_template('Booking/bookingConflict.html', formsBooking = formsBooking, text = "Edit Bookings")
     else:
         bookingsDict = {}
         bookingDB = shelve.open('Bookings')
@@ -1069,36 +1203,33 @@ def deleteBookings(id):
 
     return redirect(url_for('bookingCurrent'))
 
-@app.route('/booking/bookingHistory')
+@app.route('/booking/bookingHistory', methods=['GET', 'POST'])
 def bookingHistory():
+    refreshFacilityList()
+    facilityIDList_createBooking = facilityIDList_App
+    facilityUIDList_createBooking = facilityUIDList_App
+    formsBookingSort = bookingSortForm()
+    
+    formsBookingSort.selectData.choices = [(facilityIDList_createBooking[i], f"{facilityUIDList_createBooking[i]} - {facilityIDList_createBooking[i]}") for i in range(len(facilityUIDList_createBooking))] # refreshes the facility list
+    
     if 'User' in session:
         userID = session['User'][1]
         bookingsDict = {}
         bookingDB = shelve.open('Bookings')
         bookingsDict = bookingDB['Bookings']
-    
+        
         bookingsList=[]
         for booking in bookingsDict:
             bookings = bookingsDict.get(booking)
-            if bookings.get_date()>=date.today():
-                bookingsList.append(bookings)
+            if bookings.get_user()==userID:
+                if formsBookingSort.validate_on_submit() and request.method == "POST":
+                    sortData = formsBookingSort.selectData.data
+                    if bookings.get_facility()==sortData:
+                        bookingsList.append(bookings)
+                else:
+                    bookingsList.append(bookings)
 
-        return render_template('Booking/bookingHistory.html', bookingsList=bookingsList)
-    else:
-        return redirect(url_for('login'))
-    if 'User' in session:
-        userID = session['User'][1]
-        bookingsDict = {}
-        bookingDB = shelve.open('Bookings')
-        bookingsDict = bookingDB['Bookings']
-    
-        bookingsList=[]
-        for booking in bookingsDict:
-            bookings = bookingsDict.get(booking)
-            if bookings.get_date()>=date.today():
-                bookingsList.append(bookings)
-
-        return render_template('Booking/bookingHistory.html', bookingsList=bookingsList)
+        return render_template('Booking/bookingHistory.html', bookingsList = bookingsList, formsBookingSort = formsBookingSort)
     else:
         return redirect(url_for('login'))
 
@@ -1123,6 +1254,7 @@ def facilitiesPage(): #didnt realize the tepmplete lmao
               facilitySlotsList_searchPage)
 
         return render_template('Facilities/facilitiesMain.html', facilSearchForm = FacilityFormSearch,
+                               facilityFormSort = facilityFormSort,
                                facilIDList_searchPage = facilityIDList_searchPage,
                                facilFacilityIDList_searchPage = facilityFac_IDList_searchPage,
                                facilLocationList_searchPage = facilityLocationList_searchPage, 
@@ -1347,3 +1479,4 @@ if __name__ == '__main__':
 # 1Feb2023 - It's only geting loonger..... When can i retire? - Alan (1376th Line)
 # 10Feb2023 - THE SORT FUNCTION IS WORKING WHEEEEEEE - Alan (1584th Line)
 # 11Feb2023 - Removed so many lines of code damn
+# 12Feb2023 - 1368th Line. We're optimizing!

@@ -42,7 +42,15 @@
             </p>
             {%endif%}
         </div>
-        <a href="#" class='text-decoration-none btn btn-danger' data-bs-toggle='modal' data-bs-target='#logoutModal' style="width:10%">Log Out</a>    
+        <a href="#" class='text-decoration-none btn btn-danger' data-bs-toggle='modal' data-bs-target='#logoutModal' style="width:10%">
+            Log Out
+        </a>   
+        <a href="{{url_for('changeUserDetails', id=session.User[1])}}" class='text-decoration-none btn btn-outline-primary' style="width:10%">
+            Change Details
+        </a>  
+        <a href="{{url_for('changeUserPassword', id=session.User[1])}}" class='text-decoration-none btn btn-outline-primary' style="width:10%">
+            Change Password
+        </a> 
         <div class='modal fade' id='logoutModal' tabindex='-1' aria-labelledby='logoutModalLabel' aria-hidden='true'>
             <div class='modal-dialog'>
                 <div class='modal-content'>

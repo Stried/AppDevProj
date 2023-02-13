@@ -4,31 +4,6 @@ from wtforms.validators import DataRequired, Length, Email, EqualTo, NumberRange
 from datetime import datetime, date
 import time
 import shelve
-
-# from modules.refreshList import *
-
-# facilIDList = []
-# facilityIDList = []
-# facilityUIDList = []
-
-# facilDict = {}
-# facilDB = shelve.open('Facilities')
-# try:    
-#     if 'Facilities' in facilDB:
-#         facilDict = facilDB['Facilities']
-#     else:
-#         facilDB['Facilities'] = facilDict
-# except:
-#     print('Error in retrieving Facilities.')
-
-# for facil in facilDict:
-#     facils = facilDict.get(facil)
-#     facilAvailability = facils.get_fac_status()
-#     if facilAvailability == 'Available':
-#         facilityUID = facils.get_uniqueID()
-#         facilityUIDList.append(facilityUID)
-#         facilityID = facils.get_fac_id()
-#         facilityIDList.append(facilityID)
         
 class eventLocationCreateForm(FlaskForm):
     eventLocation =  SelectField('Facility Location : ',
@@ -165,10 +140,8 @@ class eventCreateForm(FlaskForm):
                 
         if int((self.eventStartDate.data).strftime(dateFormat)) < int(dateToday.strftime(dateFormat)):
             raise ValidationError(f"End Date cannot be behind today. Today's Date {dateToday}")
-            
-class eventEditForm(FlaskForm):
-    editEventID = IntegerField('Enter Event ID to Edit : ',
-                               validators=[DataRequired()])
+
+class eventEditForm2(FlaskForm):
     editEventName = StringField('Edit Event Name : ',
                                 validators=[],
                                 render_kw={'placeholder' : 'Leave empty if no change.'})
@@ -177,37 +150,6 @@ class eventEditForm(FlaskForm):
                                   render_kw={'placeholder' : 'Leave empty if no change.'})
     editEventVacancy = IntegerField('Edit Event Vacancy : ',
                                validators=[],
-                               render_kw={'placeholder' : 'Leave empty if no change.'})
-    editEventDate = DateTimeField('Event End Date : ',
-                              validators=[],
-                              format='%d-%m-%y %H:%M:%S',#datetime formatting, dafault to current date
-                              render_kw={'placeholder' : 'DD-MM-YY'}) #adds a placeholder
-    editEventStartDate = DateTimeField('Event Start Date : ',
-                              validators=[],
-                              format='%d-%m-%y %H:%M:%S',#datetime formatting, dafault to current date
-                              render_kw={'placeholder' : 'DD-MM-YY'}) #adds a placeholder
-    editEventType = RadioField('Edit Event Type : ',
-                               validators=[DataRequired()],
-                               choices=[('Sports', 'Sports'), ('Lifestyle', 'Lifestyle'), ('Others', 'Others')])
-    editEventLocation =  SelectField('Facility Location : ',
-                                validators=[DataRequired()],
-                                choices=[('', 'Select'), ('Ang Mo Kio', 'Ang Mo Kio'), ('Hougang', 'Hougang'), ('Macpherson', 'Macpherson'), ('Braddell', 'Braddell'), ('Seletar', 'Seletar'), ('Golden Mile', 'Golden Mile')])
-    editEventVenue = SelectField('Event Venue : ',
-                             validators=[DataRequired()])
-    editEventStatus = SelectField('Event Status : ',
-                              validators=[DataRequired()],
-                              choices=[('', 'Select'), ('Active', 'Active'), ('Closed', 'Closed')])
-    submit = SubmitField('Edit Events')
-
-class eventEditForm2(FlaskForm):
-    editEventName = StringField('Edit Event Name : ',
-                                validators=[DataRequired()],
-                                render_kw={'placeholder' : 'Leave empty if no change.'})
-    editEventDesc = TextAreaField('Edit Event Descriptrion : ',
-                                  validators=[DataRequired()],
-                                  render_kw={'placeholder' : 'Leave empty if no change.'})
-    editEventVacancy = IntegerField('Edit Event Vacancy : ',
-                               validators=[DataRequired()],
                                render_kw={'placeholder' : 'Leave empty if no change.'})
     
     editEventDate = DateField('Event End Date : ',
@@ -241,7 +183,7 @@ class eventEditForm2(FlaskForm):
                               choices=[('', 'Select'), ('Active', 'Active'), ('Closed', 'Closed')])
     submit = SubmitField('Edit Events')
     
-    def validate_eventVacancy(self, eventVenue):
+    def validate_editEventVacancy(self, eventVenue):
         eventsDict = {}
         eventDB = shelve.open('Events')
         try:
@@ -274,8 +216,8 @@ class eventEditForm2(FlaskForm):
                 facilitySlots = facils.get_fac_slots()
                 facilitySlotsList.append(facilitySlots)
                 
-        eventVenueChosen = self.eventVenue.data
-        eventVacancyChosen = self.eventVacancy.data
+        eventVenueChosen = self.editEventVenue.data
+        eventVacancyChosen = self.editEventVacancy.data
         if eventVenueChosen in facilityIDList:
             index = facilityIDList.index(eventVenueChosen)
             if eventVacancyChosen > facilitySlotsList[index]:

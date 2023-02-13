@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class='text-center'>
+    <h1 class='p-4'>Facilities Avaliable in <span class="text-primary | fst-italic" >ActivePlay</span></h1>
+    <div>
+        <div class='dropdown'>
+            <button class="btn btn-secondary | dropdown-toggle" type="button" id="dropdownLocation" data-bs-toggle="dropdown" aria-expanded="false">
+                Select Location
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownLocation" >
+                {%for facils in facilLoc%}
+                    <li class="dropdown-item"><a href="#" class="text-decoration-none | text-dark">{{facils}}</a></li>
+                {%endfor%}
+            </ul>
+            <br>
+            <p class="font-monospace | py-2">Current Location : <span class="text-primary">Ang Mo Kio</span></p>
+        </div>
+    </div>
+    {%for facils in facilList%}
+    <div>
+        <table class="table | border-1 | m-4 | fs-5 | text-center | table-striped | mx-auto" style="width: 70%;">
+            <tbody style="width: 70%;">
+                <tr>
+                    <th colspan="3">{{facils.get_fac_name()}} - <span class="font-monospace">{{facils.get_fac_id()}}</span></th>
+                </tr>
+                <thread>
+                    <td scope='col' style="width:33%"><u>Facility Status</u></td>
+                    <td scope='col' style="width:33%"><u>Facility Slots<u></td>   
+                    <td scope='col' style="width:33%"><u>Book Facility<u></td>                 
+                </thread>
+                <tr>
+                    {%if facils.get_fac_status() != 'Available'%}
+                        <td scope='col' class='text-danger'>{{facils.get_fac_status()}}</td>
+                    {%else%}
+                        <td scope='col' class='text-success'>{{facils.get_fac_status()}}</td>
+                    {%endif%}
+                    <td scope='col'>{{facils.get_fac_slots()}}</td>
+                    <td scope='col'>Link for the Facility</td>
+                </tr>
+            </tbody>    
+        </table>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

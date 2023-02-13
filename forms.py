@@ -19,9 +19,9 @@ class RegistrationForm(FlaskForm):
                         validators=[DataRequired(), Email()])
     phoneNo = IntegerField('Phone Number : ',
                            render_kw={'placeholder' : '98765432'},
-                           validators=[DataRequired(), NumberRange(min=80000000, max=99999999)])
+                           validators=[DataRequired(), NumberRange(min=80000000, max=99999999, message='Invalid Phone Number')])
     password = PasswordField('Password : ',
-                             validators=[DataRequired(), Length(min = 8)])
+                             validators=[DataRequired(), Length(min = 8, max=30)])
     confirm_password = PasswordField('Confirm Password : ',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
@@ -107,9 +107,53 @@ class EditForm(FlaskForm):
                                render_kw={'placeholder' : '98765432'},
                                validators=[DataRequired()])
 
+
     submit = SubmitField('Update')
+
+class userEditPassword(FlaskForm):
+    editPassword = PasswordField('New Password : ',
+                            validators=[DataRequired(), Length(min = 8, max=30)])
+    editConfirm_password = PasswordField('Confirm New Password : ',
+                                     validators=[DataRequired(), EqualTo('editPassword')])
+    
+    submit = SubmitField('Change Password')
 
 class userSearchForm(FlaskForm):
     userSearchItem = StringField('Search : ',
                                   validators=[DataRequired(message='Search input cannot be empty')])
     submit = SubmitField('Search')
+    
+class userForgotPasswordCheck(FlaskForm):
+    userEmail = StringField('Email : ',
+                            render_kw={'placeholder' : 'BenjaminFranklin@example.com'},
+                            validators=[Email()])
+    submitVerified = SubmitField('Verify')
+    
+    def validate_userEmail(self, userEmail):
+        userCheckList = []
+        dictUsers = {}
+        db = shelve.open('users')
+        
+        try:
+            dictUsers = db['Users']
+        except:
+            print('Error in retrieving users from user.db.')
+            
+        email = self.userEmail.data   
+        for i in dictUsers:
+            userEmailAdd = dictUsers.get(i).get_email()
+            userCheckList.append(userEmailAdd)
+            
+        print(userCheckList)
+        if self.userEmail.data not in userCheckList:
+            raise ValidationError('Email not registered.')
+    
+class userForgotPassword(FlaskForm):
+    submit = SubmitField('Submit')
+       
+class userResetPassword(FlaskForm):
+    userPassword = StringField('Password : ',
+                               validators=[DataRequired(), Length(min = 8, max=30)])
+    userConfirmPassword = PasswordField('Confirm Password : ',
+                                        validators=[DataRequired(), EqualTo('userPassword')])
+    submitReset = SubmitField('Submit')

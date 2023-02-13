@@ -78,7 +78,6 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" href="{{url_for('facilitiesPage')}}">View Facilities</a></li>
-                    <li><a class="dropdown-item" href="#">Facilities Near You</a></li>
                     {%if "User" in session%}
                         {%if session.User[0] == 'Administrator' and session.User[1] == '0000000'%}
                             <li><a name="adminOnly" class="dropdown-item text-danger" href="{{url_for('createFacilities')}}">Create Facilities</a></li>
